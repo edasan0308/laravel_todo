@@ -3,11 +3,10 @@
 namespace App\Http\Requests;
 
 use App\Task;
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class EditTask extends CreateTask
 {
-
     public function rules()
     {
         $rule = parent::rules();
@@ -15,7 +14,7 @@ class EditTask extends CreateTask
         $status_rule = Rule::in(array_keys(Task::STATUS));
 
         return $rule + [
-            'status' => 'required|'.$status_rule,
+            'status' => 'required|' . $status_rule,
         ];
     }
 
@@ -33,13 +32,13 @@ class EditTask extends CreateTask
         $messages = parent::messages();
 
         $status_labels = array_map(function($item) {
-            return $item['labgel'];
+            return $item['label'];
         }, Task::STATUS);
 
         $status_labels = implode('、', $status_labels);
 
         return $messages + [
-            'status.in' => ':attribute には ' . $status_labels . ' のいずれかを指定してください',
+            'status.in' => ':attribute には ' . $status_labels. ' のいずれかを指定してください。',
         ];
     }
 }

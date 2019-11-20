@@ -11,17 +11,27 @@
 |
 */
 
-#MethodがGETで/folders/{id}/tasksにリクエストがきた時、TaskControllerクラスのindexメソッドを呼び出す。このルーティングの名前をtasks.indexとしている。
-Route::get('/folders/{id}/tasks', 'TaskController@index')->name('tasks.index');
+Route::group(['middleware' => 'auth'], function() {
 
-//FOLDER作成ページ
-Route::get('/folders/create', 'FolderController@showCreateForm')->name('folders.create');
-Route::post('/folders/create', 'FolderController@create');
+    //ホームページ
+    Route::get('/', 'HomeController@index')->name('home');
 
-//TASK作成ページ
-Route::get('/folders/{id}/tasks/create', 'TaskController@showCreateForm')->name('tasks.create');
-Route::post('/folders/{id}/tasks/create', 'TaskController@create');
+    #TASK一覧ページ
+    Route::get('/folders/{id}/tasks', 'TaskController@index')->name('tasks.index');
 
-//TASK編集ページ
-Route::get('/folders/{id}/tasks/edit', 'TaskController@showEditForm')->name('tasks.edit');
-Route::post('/folders/{id}/tasks/edit', 'TaskController@edit');
+    //FOLDER作成ページ
+    Route::get('/folders/create', 'FolderController@showCreateForm')->name('folders.create');
+    Route::post('/folders/create', 'FolderController@create');
+
+    //TASK作成ページ
+    Route::get('/folders/{id}/tasks/create', 'TaskController@showCreateForm')->name('tasks.create');
+    Route::post('/folders/{id}/tasks/create', 'TaskController@create');
+
+    //TASK編集ページ
+    Route::get('/folders/{id}/tasks/{task_id}/edit', 'TaskController@showEditForm')->name('tasks.edit');
+    Route::post('/folders/{id}/tasks/{task_id}/edit', 'TaskController@edit');
+    
+});
+
+//認証用
+Auth::routes();

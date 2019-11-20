@@ -6,13 +6,15 @@ use App\Folder;
 use App\Task;
 use Illuminate\Http\Request;
 use App\Http\Requests\CreateTask;
+use App\Http\Requests\EditTask;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
     public function index(int $id)
     {
         //Folderモデルより全てのフォルダデータを取得
-        $folders = Folder::all();
+        $folders = Auth::user()->folders()->get();
 
         //Folderモデルより$idに一致するフォルダデータを取得
         $current_folder = Folder::find($id);
@@ -57,12 +59,32 @@ class TaskController extends Controller
         ]);
     }
 
-    public function showEditForm(int $id, int $task_id) 
+    /**
+     * GET /folders/{id}/tasks/{task_id}/edit
+     */
+    public function showEditForm(int $id, int $task_id)
     {
         $task = Task::find($task_id);
 
         return view('tasks/edit', [
             'task' => $task,
+        ]);
+    }
+
+    public function edit(int $id, int $task_id, EditTask $request)
+    {
+        //$task_idに該当するタスク情報を取得する
+        $task = Task::find($task_id);
+    
+        //requestに乗せられているフォームからのデータをモデル変数に割り当てて、DBに保存
+        $task->title = $request->title;
+        $task->status = $request->status;
+        $task->due_date = $request->due_date;
+        $task->save();
+    
+        //リダイレクト処理、タスク一覧画面へ、その時の表示ページはタスクを登録したフォルダの状態
+        return redirect()->route('tasks.index', [
+            'id' => $task->folder_id,
         ]);
     }
 }
