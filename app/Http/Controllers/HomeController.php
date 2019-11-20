@@ -15,8 +15,9 @@ class HomeController extends Controller
         // ログインユーザーに紐づくフォルダを一つ取得する
         $folder = $user->folders()->first();
 
-        // まだ一つもフォルダを作っていなければホームページをレスポンスする
+        // まだ一つもフォルダを作っていなければ週と月のフォルダを作成した後、ホームページをレスポンスする
         if (is_null($folder)) {
+            app('App\Http\Controllers\FolderController')->initFolders(); 
             return view('home');
         }
 

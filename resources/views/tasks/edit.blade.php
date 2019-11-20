@@ -52,6 +52,9 @@
             </form>
           </div>
         </nav>
+        <div class="text-center">
+          <a href="{{ route('tasks.delete', ['id' => $task->folder_id, 'task_id' => $task->id]) }}">このタスクを削除する</a>
+        </div>
       </div>
     </div>
   </div>

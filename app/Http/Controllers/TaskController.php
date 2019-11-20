@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\CreateTask;
 use App\Http\Requests\EditTask;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class TaskController extends Controller
 {
@@ -19,9 +20,47 @@ class TaskController extends Controller
         //Folderモデルより$idに一致するフォルダデータを取得
         $current_folder = Folder::find($id);
 
-        //Taskモデルより、folder_idとcurrent_folder->idで一致するものを取得
-        //OLD::$tasks = Task::where('folder_id', $current_folder->id)->get();
-        $tasks = $current_folder->tasks()->get();
+        //選択されたフォルダが週だった場合
+        if( $current_folder->title == "Weekly" ) {
+            foreach($folders as $folder) {  
+                if(!isset($tasks)) {
+                    $tasks = $folder->tasks()->get();
+                } else {
+                    $tasks = $tasks->merge($folder->tasks()->get());
+                }
+            }
+            foreach($tasks as $key => $task) {
+                if(Carbon::parse($task->due_date)->gt(Carbon::now()->addDay(7))){
+                    unset($tasks[$key]);
+                }
+            }
+            //print_r($tasks);
+        }
+
+        //選択されたフォルダが月だった場合
+        else if( $current_folder->title == "Monthly" ) {
+            foreach($folders as $folder) {  
+                if(!isset($tasks)) {
+                    $tasks = $folder->tasks()->get();
+                } else {
+                    $tasks = $tasks->merge($folder->tasks()->get());
+                }
+            }
+            foreach($tasks as $key => $task) {
+                if(Carbon::parse($task->due_date)->gt(Carbon::now()->addMonth())){
+                    unset($tasks[$key]);
+                }
+            }
+            //print_r($tasks);
+        }
+
+        //それ以外
+        else {
+            //Taskモデルより、folder_idとcurrent_folder->idで一致するものを取得
+            //OLD::$tasks = Task::where('folder_id', $current_folder->id)->get();
+            $tasks = $current_folder->tasks()->get();
+            //print_r($tasks);
+        }
 
         return view('tasks/index', [ 
             'folders' => $folders,
@@ -85,6 +124,16 @@ class TaskController extends Controller
         //リダイレクト処理、タスク一覧画面へ、その時の表示ページはタスクを登録したフォルダの状態
         return redirect()->route('tasks.index', [
             'id' => $task->folder_id,
+        ]);
+    }
+
+    public function delete(int $id, int $task_id)
+    {
+        $task = Task::find($task_id);
+        $task->delete();
+        
+        return redirect()->route('tasks.index', [
+            'id' => $id,
         ]);
     }
 }

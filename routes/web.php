@@ -30,7 +30,9 @@ Route::group(['middleware' => 'auth'], function() {
     //TASK編集ページ
     Route::get('/folders/{id}/tasks/{task_id}/edit', 'TaskController@showEditForm')->name('tasks.edit');
     Route::post('/folders/{id}/tasks/{task_id}/edit', 'TaskController@edit');
-    
+
+    //TASK削除
+    Route::get('/folders/{id}/tasks/{task_id}/delete', 'TaskController@delete')->name('tasks.delete');
 });
 
 //認証用

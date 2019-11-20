@@ -28,5 +28,17 @@ class FolderController extends Controller
             'id' => $folder->id,
         ]);
     }
+
+    public function initFolders()
+    {
+        //週と月のフォルダを作成 
+        $titles = ['Weekly', 'Monthly'];
+    
+        foreach ($titles as $title) {
+            $folder = new Folder();
+            $folder->title = $title;
+            Auth::user()->folders()->save($folder);
+        }
+    }
     
 }
